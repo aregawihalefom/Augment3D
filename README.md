@@ -19,5 +19,8 @@ In General, This works based on feature extraction and feature description using
  
 ## Usage
 
-. First reference image should be provided either by coping to `assets/images` folder with '1.jpg' filename or
-a path to the image could be provided when running the script as `python run_program.py --input_path [path]/1.jpg`
+*  First reference image should be provided either by coping to `assets/images` folder with '1.jpg' filename 
+   then run the program in your command line using `python run_program.py` 
+
+* Alternatively the reference image could provided as command line argument as `python run_program.py --input_path [path-to-the-image]/1.jpg`
+  
