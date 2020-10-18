@@ -21,62 +21,69 @@ class App(QMainWindow):
 
         # extra parameters
         self.filePath = None
-        self.image_label = QLabel('Control settings', self)
+        self.image_label = QLabel('Video to be shown where', self)
+        self.start_video_button = QtWidgets.QPushButton('Start', self)
+        self.bold_font = QtGui.QFont("Times", 10, QtGui.QFont.Bold)
 
         # menu bar for file
         self.menuBar = self.menuBar().addMenu('File')
         self.actionExit = self.menuBar.addAction('Exit')
+        self.actionOpen = self.menuBar.addAction('Open File')
 
         # initialize the app
         self.initUI()
 
+    # initialize application window with components
     def initUI(self):
         # window location and title
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
 
         # create menu bar to put some menu Options
-        # self.action = self.menuBar.addAction('Open File')
-        # self.action.setShortcut('Ctrl+O')
-        # self.action.triggered.connect(self.openFileNamesDialog)
+        self.actionOpen.setShortcut('Ctrl+O')
+        self.actionOpen.triggered.connect(self.openFileNamesDialog)
 
         # add exit option to exit the program(keyboard shortcut ctrl+q)
         self.actionExit.setShortcut('Ctrl+Q')
         self.actionExit.triggered.connect(self.exitApp)
 
         # organize UI components
-        sliderGroupBox = self.group_sliders()
+        sliderGroupBox = self.group_components()
         self.final_layout(sliderGroupBox)
         self.show()
 
-    def group_sliders(self):
+    # to group components on the main window
+    def group_components(self):
+        # create grid layout to group components
         girdLayout = QGridLayout()
-        sliderGroupBox = QGroupBox("Properties")
+        buttonGroupBox = QGroupBox("Properties")
+        buttonGroupBox.setMaximumHeight(500)
 
-        sliderGroupBox.setMaximumHeight(500)
+        # setup buttons to control video
+        self.start_video_button.clicked.connect(self.start_video)
+        self.start_video_button.setFont(self.bold_font)
 
-        # luminance and contrast
-        contrast = QLabel("Contrast", self)
-        lumin = QLabel("Luminance", self)
+        # add component to the gridLayout here
+        girdLayout.addWidget(self.start_video_button, 4, 0)
+        buttonGroupBox.setLayout(girdLayout)
+        return buttonGroupBox
 
-        newfont = QtGui.QFont("Times", 10, QtGui.QFont.Bold)
-        contrast.setFont(newfont)
-        lumin.setFont(newfont)
-
-        girdLayout.addWidget(contrast, 4, 0)
-        girdLayout.addWidget(lumin, 6, 0)
-        sliderGroupBox.setLayout(girdLayout)
-        return sliderGroupBox
-
+    # arrange the video and the other components in box layout
     def final_layout(self, sliderGroupBox):
+        # create vertical box and add elements
+        vertical_box = QVBoxLayout()
+        vertical_box.addStretch(1)
+        vertical_box.addWidget(self.image_label)
+        vertical_box.addWidget(sliderGroupBox)
 
-        hbox = QVBoxLayout()
-        hbox.addStretch(1)
-        hbox.addWidget(self.image_label)
-        hbox.addWidget(sliderGroupBox)
+        # widget to put the box layout created
         wid = QtWidgets.QWidget(self)
         self.setCentralWidget(wid)
-        wid.setLayout(hbox)
+        wid.setLayout(vertical_box)
+
+    # start display camera feed on the image label
+    def start_video(self):
+        pass
 
     # to open file manager
     def openFileNamesDialog(self):
