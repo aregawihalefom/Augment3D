@@ -16,8 +16,8 @@ class App(QMainWindow):
         self.title = 'Augmented Reality'
         self.left = 100
         self.top = 100
-        self.width = 600
-        self.height = 800
+        self.width = 300
+        self.height = 400
 
         # extra parameters
         self.timer = QTimer()
@@ -54,8 +54,8 @@ class App(QMainWindow):
         self.timer.timeout.connect(self.display_image)
 
         # organize UI components
-        sliderGroupBox = self.group_components()
-        self.final_layout(sliderGroupBox)
+        groupBox = self.group_components()
+        self.final_layout(groupBox)
         self.show()
 
     # to group components on the main window
@@ -78,12 +78,12 @@ class App(QMainWindow):
         return buttonGroupBox
 
     # arrange the video and the other components in box layout
-    def final_layout(self, sliderGroupBox):
+    def final_layout(self, groupBox):
         # create vertical box and add elements
         vertical_box = QVBoxLayout()
         vertical_box.addStretch(1)
         vertical_box.addWidget(self.image_label)
-        vertical_box.addWidget(sliderGroupBox)
+        vertical_box.addWidget(groupBox)
 
         # widget to put the box layout created
         wid = QtWidgets.QWidget(self)
