@@ -16,6 +16,10 @@ In General, This works based on feature extraction and feature description using
  ## Dependencies
 
  ```pip3 install opencv-python numpy pyqt5```
+ Incase if you get this error:<br /> <br /> 
+ 'QObject::moveToThread: Current thread (0x55fded9ab880) is not the object's thread (0x55fdedb9aee0). Cannot move to target thread (0x55fded9ab880)'
+ <br /> <br /> you need to install opencv version which matches with your installed pyqt version<br /> 
+  in our case ```opencv-python==4.3.0.36``` and ```pyqt5==5.15.1```  works fine. <br /> 
 
 ## Usage
 

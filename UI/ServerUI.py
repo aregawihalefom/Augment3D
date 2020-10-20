@@ -2,7 +2,7 @@ import sys
 
 import cv2
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal, QTimer
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtWidgets import QWidget, QLabel, QApplication, QMainWindow, QVBoxLayout, QSlider, QGridLayout, QGroupBox
 
@@ -20,6 +20,8 @@ class App(QMainWindow):
         self.height = 800
 
         # extra parameters
+        self.timer = QTimer()
+        self.cap = None
         self.filePath = None
         self.image_label = QLabel('Video to be shown where', self)
         self.start_video_button = QtWidgets.QPushButton('Start', self)
@@ -48,6 +50,9 @@ class App(QMainWindow):
         self.actionExit.setShortcut('Ctrl+Q')
         self.actionExit.triggered.connect(self.exitApp)
 
+        # set timer timeout callback function
+        self.timer.timeout.connect(self.display_image)
+
         # organize UI components
         sliderGroupBox = self.group_components()
         self.final_layout(sliderGroupBox)
@@ -61,7 +66,7 @@ class App(QMainWindow):
         buttonGroupBox.setMaximumHeight(500)
 
         # setup buttons to control video
-        self.start_video_button.clicked.connect(self.stop_video)
+        self.start_video_button.clicked.connect(self.start_video)
         self.start_video_button.setFont(self.bold_font)
         self.stop_video_button.clicked.connect(self.stop_video)
         self.stop_video_button.setFont(self.bold_font)
@@ -87,11 +92,38 @@ class App(QMainWindow):
 
     # start display camera feed on the image label
     def start_video(self):
-        pass
+        # if timer is stopped
+        if not self.timer.isActive():
+            # create video capture  and start timer
+            self.cap = cv2.VideoCapture(0)
+            self.timer.start(10)
 
     # stop displaying camera feed to the image label
     def stop_video(self):
-        pass
+        # if the camera is alraedy started close it
+        if self.timer.isActive():
+            # close camera
+            self.cap.release()
+            self.image_label.setText("Camera is closed")
+
+        # else:
+        #     self.image_label.setText('Camera is not started')
+
+    # display image to label
+    def display_image(self):
+        try:
+            # read form camera
+            ret, image = self.cap.read()
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            # get image info
+            height, width, channel = image.shape
+            step = channel * width
+            # create QImage from image
+            qImg = QImage(image.data, width, height, step, QImage.Format_RGB888)
+            # show image in img_label
+            self.image_label.setPixmap(QPixmap.fromImage(qImg))
+        except Exception:
+            pass
 
     # to open file manager
     def openFileNamesDialog(self):
