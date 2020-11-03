@@ -213,7 +213,7 @@ class App(QMainWindow):
             # show image in img_label
             self.videoLabel.setPixmap(QPixmap.fromImage(qImg))
             # call back for drawing
-            cv2.setMouseCallback("Mouse moves", draw_shape)
+            # cv2.setMouseCallback("Mouse moves", draw_shape)
 
         except Exception as ex:
             print(ex)
