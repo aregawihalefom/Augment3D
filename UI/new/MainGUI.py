@@ -16,7 +16,7 @@ class App(QMainWindow):
         self.title = 'PROJECTION AR'
         self.left = 300
         self.top = 100
-        self.width = 1024
+        self.width = 1400
         self.height = 900
         self.bold_font = QtGui.QFont("Times", 10, QtGui.QFont.Bold)
         self.video_started = False
@@ -63,8 +63,7 @@ class App(QMainWindow):
 
         """
         # Main video label
-        self.videoLabel = QLabel('Video feed not avaliable , Start video by clicking on the start button on the top '
-                                 'left of the tool list', self)
+        self.videoLabel = QLabel('Start Video', self)
         self.videoLabel.setFont(self.bold_font)
 
         # Start video button
@@ -125,6 +124,7 @@ class App(QMainWindow):
 
         toolsButtonGroupBox = QGroupBox("Tools")
         toolsButtonGroupBox.setToolTip("Tool Box")
+        toolsButtonGroupBox
         # buttonGroupBox.setMaximumHeight(500)
 
         # add component to the gridLayout here
@@ -156,7 +156,7 @@ class App(QMainWindow):
 
         # add widgets to the layout
         gridLayout.addWidget(buttonGroup, 0, 0)
-        gridLayout.addWidget(self.videoLabel, 0, 1, 1, 2)
+        gridLayout.addWidget(self.videoLabel, 0, 1, 1, 8)
 
         # widget for the general layout
         wid = QtWidgets.QWidget(self)
@@ -172,11 +172,12 @@ class App(QMainWindow):
             if not self.timer.isActive():
                 # create video capture  and start timer
                 self.cap = cv2.VideoCapture(0)
+                self.cap.set(3, 1280)
+                self.cap.set(4, 720)
                 self.videoLabel.setText("Connecting to camera")
                 self.video_started = True
                 self.change_button_status()
                 self.timer.start(10)
-
 
         except Exception as ex:
             print(ex)
@@ -224,7 +225,7 @@ class App(QMainWindow):
         CURSOR_NEW = QtGui.QCursor(QtGui.QPixmap('cursors/icons8-pencil-28.png'))
         self.startVideoButton.setEnabled(False)
         self.setCursor(CURSOR_NEW)
-        pass
+
 
     def openFileNamesDialog(self):
         """
