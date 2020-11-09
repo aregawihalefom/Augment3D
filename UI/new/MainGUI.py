@@ -16,7 +16,7 @@ class App(QMainWindow):
         self.title = 'PROJECTION AR'
         self.left = 300
         self.top = 100
-        self.width = 1024
+        self.width = 1400
         self.height = 900
         self.bold_font = QtGui.QFont("Times", 10, QtGui.QFont.Bold)
         self.video_started = False
@@ -45,6 +45,7 @@ class App(QMainWindow):
         # window location and title
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
+        self.setWindowIcon(QIcon("icons/icon.png"))
 
         # group the UI compoents
         buttonGroup = self.groupcomponents()
@@ -63,8 +64,7 @@ class App(QMainWindow):
 
         """
         # Main video label
-        self.videoLabel = QLabel('Video feed not avaliable , Start video by clicking on the start button on the top '
-                                 'left of the tool list', self)
+        self.videoLabel = QLabel('Start Video', self)
         self.videoLabel.setFont(self.bold_font)
 
         # Start video button
@@ -125,6 +125,7 @@ class App(QMainWindow):
 
         toolsButtonGroupBox = QGroupBox("Tools")
         toolsButtonGroupBox.setToolTip("Tool Box")
+        toolsButtonGroupBox
         # buttonGroupBox.setMaximumHeight(500)
 
         # add component to the gridLayout here
@@ -156,7 +157,7 @@ class App(QMainWindow):
 
         # add widgets to the layout
         gridLayout.addWidget(buttonGroup, 0, 0)
-        gridLayout.addWidget(self.videoLabel, 0, 1, 1, 2)
+        gridLayout.addWidget(self.videoLabel, 0, 1, 1, 8)
 
         # widget for the general layout
         wid = QtWidgets.QWidget(self)
@@ -171,12 +172,13 @@ class App(QMainWindow):
             # if timer is stopped
             if not self.timer.isActive():
                 # create video capture  and start timer
-                self.cap = cv2.VideoCapture(2)
+                self.cap = cv2.VideoCapture(0)
+                self.cap.set(3, 1280)
+                self.cap.set(4, 720)
                 self.videoLabel.setText("Connecting to camera")
                 self.video_started = True
                 self.change_button_status()
-                self.timer.start(10)
-
+                self.timer.start(3)
 
         except Exception as ex:
             print(ex)
@@ -207,11 +209,14 @@ class App(QMainWindow):
             # get image info
             height, width, channel = image.shape
             step = channel * width
+
             # create QImage from imageQImage::Format_Grayscale8
             qImg = QImage(image.data, width, height, step, QImage.Format_RGB888)
 
             # show image in img_label
             self.videoLabel.setPixmap(QPixmap.fromImage(qImg))
+            self.videoLabel.mouseMoveEvent = self.getPos
+
             # call back for drawing
             # cv2.setMouseCallback("Mouse moves", draw_shape)
 
@@ -224,7 +229,6 @@ class App(QMainWindow):
         CURSOR_NEW = QtGui.QCursor(QtGui.QPixmap('cursors/icons8-pencil-28.png'))
         self.startVideoButton.setEnabled(False)
         self.setCursor(CURSOR_NEW)
-        pass
 
     def openFileNamesDialog(self):
         """
@@ -262,6 +266,15 @@ class App(QMainWindow):
             self.pencilButton.setEnabled(True)
             self.lassoButton.setEnabled(True)
             self.rectangleButton.setEnabled(True)
+
+    def getPos(self, event):
+        x = event.pos().x()
+        y = event.pos().y()
+
+        if event.buttons() == QtCore.Qt.RightButton:
+            print("That is right button")
+        if event.buttons() == QtCore.Qt.LeftButton:
+            print("this is left button")
 
 
 class Events:
