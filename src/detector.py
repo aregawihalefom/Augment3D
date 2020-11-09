@@ -5,6 +5,7 @@ filename = '../assets/images/cheekboard.png'
 img = cv2.imread(filename)
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
+# harris corner
 gray = np.float32(gray)
 dst = cv2.cornerHarris(gray, 2, 3, 0.04)
 

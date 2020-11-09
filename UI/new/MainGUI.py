@@ -45,6 +45,7 @@ class App(QMainWindow):
         # window location and title
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
+        self.setWindowIcon(QIcon("icons/icon.png"))
 
         # group the UI compoents
         buttonGroup = self.groupcomponents()
