@@ -21,6 +21,8 @@ class App(QMainWindow):
         self.bold_font = QtGui.QFont("Times", 10, QtGui.QFont.Bold)
         self.video_started = False
 
+
+
         # setting cursor
 
         # extra parameters
@@ -175,8 +177,10 @@ class App(QMainWindow):
                 self.cap = cv2.VideoCapture(0)
                 self.cap.set(3, 1280)
                 self.cap.set(4, 720)
+
                 self.videoLabel.setText("Connecting to camera")
                 self.video_started = True
+
                 self.change_button_status()
                 self.timer.start(3)
 
@@ -215,10 +219,6 @@ class App(QMainWindow):
 
             # show image in img_label
             self.videoLabel.setPixmap(QPixmap.fromImage(qImg))
-            self.videoLabel.mouseMoveEvent = self.getPos
-
-            # call back for drawing
-            # cv2.setMouseCallback("Mouse moves", draw_shape)
 
         except Exception as ex:
             print(ex)
@@ -267,55 +267,7 @@ class App(QMainWindow):
             self.lassoButton.setEnabled(True)
             self.rectangleButton.setEnabled(True)
 
-    def getPos(self, event):
-        x = event.pos().x()
-        y = event.pos().y()
-
-        if event.buttons() == QtCore.Qt.RightButton:
-            print("That is right button")
-        if event.buttons() == QtCore.Qt.LeftButton:
-            print("this is left button")
-
-
-class Events:
-
-    def __init__(self):
-        pass
-
-
-draw = xi = yi = new_line = xi_backup = yi_backup = 0
-
-
-# mouse callback function
-def draw_shape(event, x, y, flags, param):
-    global draw, xi, yi, new_line, xi_backup, yi_backup
-    if event == cv2.EVENT_LBUTTONDOWN:
-        draw = True
-        xi.append(x)
-        yi.append(y)
-    # new_line += 1
-
-    elif event == cv2.EVENT_MOUSEMOVE:
-        if draw:
-            xi.append(x)
-            yi.append(y)
-
-    elif event == cv2.EVENT_LBUTTONUP:
-        xi.append(-4)
-        yi.append(-4)
-        new_line += 1
-        draw = False
-
-    elif event == cv2.EVENT_MOUSEWHEEL:
-        xi_backup, yi_backup = xi, yi
-        print(xi_backup)
-        print("Cleared Mouse event")
-        xi.clear()
-        yi.clear()
-        new_line = 0
-    elif event == cv2.EVENT_RBUTTONDBLCLK:
-        print("Button double clicked")
-        xi, yi = xi_backup, yi_backup
+    ## add different events
 
 
 if __name__ == '__main__':
