@@ -1,10 +1,13 @@
 import sys
-
+import numpy as np
 import cv2
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import QThread, pyqtSignal, QTimer
-from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtCore import QThread, pyqtSignal, QTimer, Qt, QPoint
+from PyQt5.QtGui import QPixmap, QImage, QPainter, QPen
 from PyQt5.QtWidgets import QWidget, QLabel, QApplication, QMainWindow, QVBoxLayout, QSlider, QGridLayout, QGroupBox
+
+# for debugging purpose
+import traceback
 
 
 class App(QMainWindow):
@@ -18,6 +21,15 @@ class App(QMainWindow):
         self.top = 100
         self.width = 300
         self.height = 400
+
+        # -------------------- annotation parameters  -------------------
+        self.annotation_image = QImage(self.size(), QImage.Format_RGB32)
+        self.annotation_image.fill(Qt.transparent)
+
+        self.drawing = False
+        self.brushSize = 3
+        self.brushColor = Qt.green
+        self.lastPoint = QPoint()
 
         # extra parameters
         self.timer = QTimer()
@@ -105,6 +117,7 @@ class App(QMainWindow):
             # close camera
             self.cap.release()
             self.image_label.setText("Camera is closed")
+            self.timer.stop()
 
         # else:
         #     self.image_label.setText('Camera is not started')
@@ -115,33 +128,74 @@ class App(QMainWindow):
             # read form camera
             ret, image = self.cap.read()
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
             # get image info
             height, width, channel = image.shape
             step = channel * width
-            # create QImage from image
+
+            # overlay annotation on to video feed
             qImg = QImage(image.data, width, height, step, QImage.Format_RGB888)
-            # show image in img_label
+
+            painterInstance = QtGui.QPainter()
+            painterInstance.begin(qImg)
+            painterInstance.drawImage(0,0, self.annotation_image)
+            painterInstance.end()
+
+            # create QImage and show image on img_label
             self.image_label.setPixmap(QPixmap.fromImage(qImg))
-        except Exception:
-            pass
+
+        except Exception as e:
+            traceback.print_exc()
 
     # to open file manager
     def openFileNamesDialog(self):
         options = QtWidgets.QFileDialog.Options()
         options |= QtWidgets.QFileDialog.DontUseNativeDialog
+
         files, _ = QtWidgets.QFileDialog.getOpenFileNames(
             self, "QtWidgets.QFileDialog.getOpenFileNames()",
             "", "Dicom Files (*.*)", options=options)
         if files:
             self.filePath = files[0]
-            # go ahead and read the file if necessary
+            # TODO:
+            # get file resource
 
     # will exit the application
     def exitApp(self):
         sys.exit(0)
 
+    # --------------- annotation drawing stuff -------------------
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.drawing = True
+            self.lastPoint = event.pos()
 
-if __name__ == '__main__':
+    def mouseMoveEvent(self, event):
+        if(event.buttons() & Qt.LeftButton) & self.drawing:
+            painter = QPainter(self.annotation_image)
+            painter.setPen(QPen(self.brushColor, self.brushSize, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+            painter.drawLine(self.lastPoint, event.pos())
+            self.lastPoint = event.pos()
+            self.update()
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.drawing = False
+            self.save()
+
+    def paintEvent(self, event):
+        canvasPainter = QPainter(self)
+        canvasPainter.drawImage(self.rect(), self.annotation_image, self.annotation_image.rect())
+
+    def save(self):
+        filePath = 'annotation.png'
+        self.annotation_image.save(filePath)
+
+    # --------------------- anootaion end here ---------------------
+
+
+# execute everything
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     ex = App()
     ex.show()
