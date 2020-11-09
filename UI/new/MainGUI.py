@@ -171,7 +171,7 @@ class App(QMainWindow):
             # if timer is stopped
             if not self.timer.isActive():
                 # create video capture  and start timer
-                self.cap = cv2.VideoCapture(0)
+                self.cap = cv2.VideoCapture(2)
                 self.videoLabel.setText("Connecting to camera")
                 self.video_started = True
                 self.change_button_status()

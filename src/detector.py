@@ -30,7 +30,7 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 # painiting the detected corners
 for corner in corners:
     x,y = corner.ravel()
-    cv2.putText(img, '*', (x,y), font, 1, color, 2, cv2.LINE_AA)
+    cv2.putText(img, '*', (x, y), font, 1, color, 2, cv2.LINE_AA)
 
 # This is general
 vis = np.concatenate((img, draw), axis=1)
