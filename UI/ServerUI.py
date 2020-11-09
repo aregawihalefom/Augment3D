@@ -105,6 +105,7 @@ class App(QMainWindow):
             # close camera
             self.cap.release()
             self.image_label.setText("Camera is closed")
+            self.timer.stop()
 
         # else:
         #     self.image_label.setText('Camera is not started')
@@ -115,13 +116,15 @@ class App(QMainWindow):
             # read form camera
             ret, image = self.cap.read()
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            
             # get image info
             height, width, channel = image.shape
             step = channel * width
-            # create QImage from image
+            
+            # create QImage and show image on img_label
             qImg = QImage(image.data, width, height, step, QImage.Format_RGB888)
-            # show image in img_label
             self.image_label.setPixmap(QPixmap.fromImage(qImg))
+            
         except Exception:
             pass
 
@@ -129,19 +132,22 @@ class App(QMainWindow):
     def openFileNamesDialog(self):
         options = QtWidgets.QFileDialog.Options()
         options |= QtWidgets.QFileDialog.DontUseNativeDialog
+        
         files, _ = QtWidgets.QFileDialog.getOpenFileNames(
             self, "QtWidgets.QFileDialog.getOpenFileNames()",
             "", "Dicom Files (*.*)", options=options)
         if files:
             self.filePath = files[0]
-            # go ahead and read the file if necessary
+            # TODO:
+            # get file resource 
 
     # will exit the application
     def exitApp(self):
         sys.exit(0)
 
 
-if __name__ == '__main__':
+# execute everything
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     ex = App()
     ex.show()
