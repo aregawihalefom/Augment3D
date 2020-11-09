@@ -177,7 +177,7 @@ class App(QMainWindow):
                 self.videoLabel.setText("Connecting to camera")
                 self.video_started = True
                 self.change_button_status()
-                self.timer.start(10)
+                self.timer.start(3)
 
         except Exception as ex:
             print(ex)
@@ -208,11 +208,14 @@ class App(QMainWindow):
             # get image info
             height, width, channel = image.shape
             step = channel * width
+
             # create QImage from imageQImage::Format_Grayscale8
             qImg = QImage(image.data, width, height, step, QImage.Format_RGB888)
 
             # show image in img_label
             self.videoLabel.setPixmap(QPixmap.fromImage(qImg))
+            self.videoLabel.mouseMoveEvent = self.getPos
+
             # call back for drawing
             # cv2.setMouseCallback("Mouse moves", draw_shape)
 
@@ -225,7 +228,6 @@ class App(QMainWindow):
         CURSOR_NEW = QtGui.QCursor(QtGui.QPixmap('cursors/icons8-pencil-28.png'))
         self.startVideoButton.setEnabled(False)
         self.setCursor(CURSOR_NEW)
-
 
     def openFileNamesDialog(self):
         """
@@ -263,6 +265,15 @@ class App(QMainWindow):
             self.pencilButton.setEnabled(True)
             self.lassoButton.setEnabled(True)
             self.rectangleButton.setEnabled(True)
+
+    def getPos(self, event):
+        x = event.pos().x()
+        y = event.pos().y()
+
+        if event.buttons() == QtCore.Qt.RightButton:
+            print("That is right button")
+        if event.buttons() == QtCore.Qt.LeftButton:
+            print("this is left button")
 
 
 class Events:
