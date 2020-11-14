@@ -1,9 +1,9 @@
-import cv2
-import numpy as np
-
-filename = '../assets/images/cheekboard.png'
+import cv2filename = '../assets/images/cheekboard.png'
 img = cv2.imread(filename)
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+import numpy as np
+
 
 # harris corner
 gray = np.float32(gray)
