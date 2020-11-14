@@ -10,20 +10,20 @@ from src.objLoader import *
 MIN_MATCHES = 10
 
 
-class AR():
+class AR:
     """" Extract detail information  for the AR implementation"""
 
     def __init__(self, input_image, scale):
 
         self.scale = scale  # scale for the 3D object size
-        self.reference_image = input_image # reference image
+        self.reference_image = input_image  # reference image
         self.H = None  # Homography
 
         # matrix of camera parameters (made up but works quite well for me)
         self.A = np.array([[800, 0, 320], [0, 800, 240], [0, 0, 1]])
 
         # 3D object to be displayed
-        self.object3D = OBJ('assets/models/wolf.obj', swapyz=True)
+        self.object3D = OBJ('../assets/models/eyeball.obj', swapyz=True)
 
         # feature extractor and descriptor
         self.sift = cv2.xfeatures2d.SIFT_create()
@@ -31,7 +31,7 @@ class AR():
         # start the process
         self.kp_model, self.des_model, self.model_image = self.intialize_refence_image()
 
-        # intialize model
+        # initialize model
         self.intialize_refence_image()
 
         # Perform the main application task ( grab_video , extract features , descriptors and create homograpy)
@@ -99,7 +99,7 @@ class AR():
                 print("No enough points")
                 exit()
 
-    def draw_boundary(self,frame):
+    def draw_boundary(self, frame):
         h, w = self.model_image.shape[0], self.model_image.shape[1]
         pts = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
         dst = cv2.perspectiveTransform(pts, self.H)
@@ -111,7 +111,6 @@ class AR():
 
         # match descriptor with model
         # FLANN MATCHER
-
 
         FLANN_INDEX_KDTREE = 0
 
@@ -224,7 +223,7 @@ if __name__ == '__main__':
     # Properties
     args = parser.parse_args()
     input_path = args.input_dir
-    scale  = args.scale
+    scale = args.scale
 
     if input_path is None:
         input_path = "assets/images/1.jpg"

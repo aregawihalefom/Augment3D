@@ -136,8 +136,7 @@ class App(QMainWindow):
             # overlay annotation on to video feed
             qImg = QImage(image.data, width, height, step, QImage.Format_RGB888)
 
-            painterInstance = QtGui.QPainter()
-            painterInstance.begin(qImg)
+            self.pa.begin(qImg)
             painterInstance.drawImage(0,0, self.annotation_image)
             painterInstance.end()
 
