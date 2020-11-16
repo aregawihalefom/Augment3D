@@ -19,12 +19,12 @@ class App(QMainWindow):
         self.title = 'Augmented Reality'
         self.left = 100
         self.top = 100
-        self.width = 300
-        self.height = 400
+        self.width = 600
+        self.height = 600
 
         # -------------------- annotation parameters  -------------------
         self.annotation_image = QImage(self.size(), QImage.Format_RGB32)
-        self.annotation_image.fill(Qt.transparent)
+        self.annotation_image.fill(Qt.white)
 
         self.drawing = False
         self.brushSize = 3
@@ -138,7 +138,7 @@ class App(QMainWindow):
 
             painterInstance = QtGui.QPainter()
             painterInstance.begin(qImg)
-            painterInstance.drawImage(0,0, self.annotation_image)
+            painterInstance.drawImage(0, 0, self.annotation_image)
             painterInstance.end()
 
             # create QImage and show image on img_label
@@ -171,7 +171,8 @@ class App(QMainWindow):
             self.lastPoint = event.pos()
 
     def mouseMoveEvent(self, event):
-        if(event.buttons() & Qt.LeftButton) & self.drawing:
+
+        if (event.buttons() & Qt.LeftButton) & self.drawing:
             painter = QPainter(self.annotation_image)
             painter.setPen(QPen(self.brushColor, self.brushSize, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
             painter.drawLine(self.lastPoint, event.pos())
