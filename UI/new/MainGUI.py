@@ -1,12 +1,30 @@
 import sys
 
 import cv2
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import QThread, pyqtSignal, QTimer, Qt, QPoint
-from PyQt5.QtGui import QPixmap, QImage, QIcon, QCursor, QPainter, QPen, QFont
+from PyQt5 import QtWidgets, QtGui
+from PyQt5.QtCore import QTimer, Qt, QPoint
+from PyQt5.QtGui import QPixmap, QImage, QIcon, QPainter, QPen
 from PyQt5.QtWidgets import QWidget, QLabel, QApplication, QMainWindow, QVBoxLayout, QSlider, QGridLayout, QGroupBox
 
 
+# this UI serve as image display window for projector
+class PhotoToProjector(QWidget):
+    """
+    This "window" is a QWidget. If it has no parent, it
+    will appear as a free-floating window as we want.
+    """
+    def __init__(self):
+        super().__init__()
+        layout = QVBoxLayout()
+        self.label = QLabel("Another Window")
+        self.label.setAttribute(Qt.WA_TranslucentBackground, True)
+
+        layout.addWidget(self.label)
+        self.setLayout(layout)
+        self.setWindowOpacity(0.9)
+
+
+# this UI serve as main window to draw the annotation
 class App(QMainWindow):
 
     def __init__(self):
@@ -68,6 +86,9 @@ class App(QMainWindow):
 
         # show the UI
         self.show()
+        # create second window
+        self.secondaryWindow = PhotoToProjector()
+        self.secondaryWindow.show()
 
     def createUIComponents(self):
         """
@@ -183,7 +204,7 @@ class App(QMainWindow):
             # if timer is stopped
             if not self.timer.isActive():
                 # create video capture  and start timer
-                self.cap = cv2.VideoCapture(0)
+                self.cap = cv2.VideoCapture(2)
                 self.cap.set(3, self.video_width)
                 self.cap.set(4, self.video_height)
 
@@ -278,7 +299,7 @@ class App(QMainWindow):
             self.lassoButton.setEnabled(True)
             self.rectangleButton.setEnabled(True)
 
-    ## add different events
+    # add different events
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.lastPoint = event.pos()
@@ -287,10 +308,14 @@ class App(QMainWindow):
     def mouseMoveEvent(self, event):
 
         if (event.buttons() & Qt.LeftButton) & self.drawing and self.rect().contains(event.pos()):
+            self.painter.setOpacity(0.9)
             self.painter.setPen(QPen(self.brushColor, self.brushSize, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
             self.painter.drawLine(self.lastPoint, event.pos() )
             self.annotation_label.setPixmap(self.draw_pixmap)
             self.lastPoint = event.pos()
+
+            # update secondary window image
+            self.secondaryWindow.label.setPixmap(self.draw_pixmap)
             self.update()
 
     # highlight
