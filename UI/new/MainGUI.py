@@ -2,8 +2,8 @@ import sys
 
 import cv2
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import QThread, pyqtSignal, QTimer
-from PyQt5.QtGui import QPixmap, QImage, QIcon, QCursor
+from PyQt5.QtCore import QThread, pyqtSignal, QTimer, Qt, QPoint
+from PyQt5.QtGui import QPixmap, QImage, QIcon, QCursor, QPainter, QPen, QFont
 from PyQt5.QtWidgets import QWidget, QLabel, QApplication, QMainWindow, QVBoxLayout, QSlider, QGridLayout, QGroupBox
 
 
@@ -18,18 +18,29 @@ class App(QMainWindow):
         self.top = 100
         self.width = 1400
         self.height = 900
+        self.video_height = 720
+        self.video_width = 1280
         self.bold_font = QtGui.QFont("Times", 10, QtGui.QFont.Bold)
         self.video_started = False
-
-
-
-        # setting cursor
+        self.pencil_started = False
 
         # extra parameters
         self.timer = QTimer()
         self.cap = None
         self.filePath = None
         self.cursor = None
+
+        # variable for annotation
+        self.draw_pixmap = QPixmap(self.video_width, self.video_height)
+        self.draw_pixmap.fill(Qt.transparent)
+        self.painter = QPainter(self.draw_pixmap)
+        self.annotation_label = QLabel(self)
+
+        # custom drawing variables
+        self.drawing = False
+        self.brushSize = 6
+        self.brushColor = Qt.green
+        self.lastPoint = QPoint()
 
         # 1. components of the UI
         self.createUIComponents()
@@ -47,13 +58,10 @@ class App(QMainWindow):
         # window location and title
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
-        self.setWindowIcon(QIcon("icons/icon.png"))
+        self.setWindowIcon(QIcon("icons/icon-green.png"))
 
         # group the UI compoents
         buttonGroup = self.groupcomponents()
-
-        # set timer timeout callback function
-        self.timer.timeout.connect(self.displayImage)
 
         #  final layout.. all compoents together
         self.finalUi(buttonGroup)
@@ -160,6 +168,7 @@ class App(QMainWindow):
         # add widgets to the layout
         gridLayout.addWidget(buttonGroup, 0, 0)
         gridLayout.addWidget(self.videoLabel, 0, 1, 1, 8)
+        gridLayout.addWidget(self.annotation_label, 0, 1, 1, 8)
 
         # widget for the general layout
         wid = QtWidgets.QWidget(self)
@@ -175,13 +184,14 @@ class App(QMainWindow):
             if not self.timer.isActive():
                 # create video capture  and start timer
                 self.cap = cv2.VideoCapture(0)
-                self.cap.set(3, 1280)
-                self.cap.set(4, 720)
+                self.cap.set(3, self.video_width)
+                self.cap.set(4, self.video_height)
 
                 self.videoLabel.setText("Connecting to camera")
                 self.video_started = True
-
                 self.change_button_status()
+                # set timer timeout callback function
+                self.timer.timeout.connect(self.displayImage)
                 self.timer.start(3)
 
         except Exception as ex:
@@ -229,6 +239,7 @@ class App(QMainWindow):
         CURSOR_NEW = QtGui.QCursor(QtGui.QPixmap('cursors/icons8-pencil-28.png'))
         self.startVideoButton.setEnabled(False)
         self.setCursor(CURSOR_NEW)
+        self.drawing = True
 
     def openFileNamesDialog(self):
         """
@@ -268,10 +279,39 @@ class App(QMainWindow):
             self.rectangleButton.setEnabled(True)
 
     ## add different events
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.lastPoint = event.pos()
+            self.drawing = True
+
+    def mouseMoveEvent(self, event):
+
+        if (event.buttons() & Qt.LeftButton) & self.drawing and self.rect().contains(event.pos()):
+            self.painter.setPen(QPen(self.brushColor, self.brushSize, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+            self.painter.drawLine(self.lastPoint, event.pos() )
+            self.annotation_label.setPixmap(self.draw_pixmap)
+            self.lastPoint = event.pos()
+            self.update()
+
+    # highlight
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.drawing = False
+            self.save()
+
+    def save(self):
+        try:
+            filePath = 'annotation.png'
+            self.draw_pixmap.save(filePath)
+        except Exception as ex:
+            print(ex)
 
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = App()
-    ex.show()
-    sys.exit(app.exec_())
+    try:
+        app = QApplication(sys.argv)
+        ex = App()
+        ex.show()
+        sys.exit(app.exec_())
+    except Exception as ex:
+        print(ex)

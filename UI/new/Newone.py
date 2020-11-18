@@ -26,7 +26,6 @@ class MainWindow(QMainWindow):
         self.maskWindow.setText("Message is on the mask Qlabel object")
         self.msgLabel = QLabel(self)
         self.msgLabel.setGeometry(675, 300, 100, 20)
-
         self.marker_label = QLabel(self)
 
         pixmap = QPixmap(100, 100)
