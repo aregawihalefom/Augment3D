@@ -5,11 +5,9 @@ from Algorithm import mainAlgorithm
 
 if __name__ == '__main__':
 
-    filename = '../assets/models/with_bordeaux_background.png'
+    filename = '../assets/models/computer_grid.png'
     dim = (600, 600)
     img = cv2.resize(cv2.imread(filename), dim)
-
-    print(img.shape)
 
     # prepare main algorithm
     tool = mainAlgorithm(img, desc="Main algorithm")

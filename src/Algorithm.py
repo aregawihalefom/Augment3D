@@ -16,16 +16,16 @@ class mainAlgorithm:
         pass
 
     def based_on_green_channel(self):
-        blue_channel = self.input_image[:, :, 1]
+        blue_channel = self.input_image[:, :, 2]
 
-        low_threshold = 50
+        low_threshold = 100
         high_threshold = 200
 
-        edges = cv2.Canny(np.uint8(blue_channel), low_threshold, high_threshold)
+        edges = cv2.Canny(np.uint8(self.input_image), low_threshold, high_threshold)
         kernel = np.ones((4, 4), np.uint8)
-        dilated_edges = cv2.dilate(edges, kernel, iterations=1)
+        #dilated_edges = cv2.dilate(edges, kernel, iterations=2)
 
-        return dilated_edges
+        return edges
 
     def based_on_horizontal_vertical(self):
         raise NotImplementedError
